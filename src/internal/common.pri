@@ -1,0 +1,39 @@
+DEPENDPATH += .
+INCLUDEPATH += .
+
+CONFIG -= qt
+
+QMAKE_LIBDIR += "$(TargetDir)"
+
+QMAKE_CXXFLAGS += /W1 
+QMAKE_CXXFLAGS += /MP
+QMAKE_CXXFLAGS += /GS
+QMAKE_CXXFLAGS += /Zc:threadSafeInit-
+
+QMAKE_CXXFLAGS_RELEASE += /Zi
+
+QMAKE_LFLAGS += /MACHINE:X86
+
+QMAKE_LFLAGS_DEBUG += /debugtype:cv,fixup
+
+QMAKE_LFLAGS_RELEASE += /DEBUG
+QMAKE_LFLAGS_RELEASE += /OPT:REF /OPT:ICF /SUBSYSTEM:WINDOWS",5.01"
+
+CONFIG(debug, debug|release) {
+    DESTDIR = ../../bin/debug
+    QMAKE_LIBDIR += ../../bin/debug
+}
+else {
+    DESTDIR = ../../bin/release
+    QMAKE_LIBDIR += ../../bin/release
+}
+
+CharacterSet = 1
+
+#QMAKE_CXXFLAGS_RELEASE += -Os -O1
+
+QMAKE_CXXFLAGS_EXCEPTIONS_ON = -EHsc
+QMAKE_CXXFLAGS_STL_ON = -EHsc
+
+DEFINES += _CRT_SECURE_NO_WARNINGS
+
