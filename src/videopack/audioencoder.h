@@ -15,6 +15,7 @@ public:
 	~AudioEncoder();
 
 	int initAAC(int channels, int sampleRate, int bitRate);
+	int initLearPCM(int channels, int sampleRate, int frameSize);
 	void uninit();
 
 	AVCodecContext* getContext();
@@ -24,4 +25,5 @@ public:
 private:
 	AVCodecContext* m_ctx;
 	AVFrame*		m_frame;
+	bool			m_done;
 };

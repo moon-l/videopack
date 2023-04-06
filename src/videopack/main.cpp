@@ -40,7 +40,8 @@ int main(int argc, char** argv)
 	}
 
 	AudioEncoder aEncoder;
-	ret = aEncoder.initAAC(AUDIO_CHANNELS, AUDIO_SAMPLE_RATE, AUDIO_BIT_RATE);
+	//ret = aEncoder.initAAC(AUDIO_CHANNELS, AUDIO_SAMPLE_RATE, AUDIO_BIT_RATE);
+	ret = aEncoder.initLearPCM(AUDIO_CHANNELS, AUDIO_SAMPLE_RATE, 882);
 	if (ret < 0)
 	{
 		printf("fail to init audio encoder, ret=%d\n", ret);
@@ -103,7 +104,7 @@ int main(int argc, char** argv)
 
 	bool encodeAudio = true, encodeVideo = true;
 	std::vector<AVPacket*> pkts;
-	double apts = 0, vpts = 0;
+	int64_t apts = 0, vpts = 0;
 
 	unsigned ats = 0, vts = 0;
 
@@ -164,7 +165,12 @@ int main(int argc, char** argv)
 			}
 			else
 			{
+				int64_t pre = vpts;
 				vpts = vts * 1000;
+				if (vpts <= pre)
+				{
+					printf("video back ts, pre=%lld, now=%lld\n", pre, vpts);
+				}
 			}
 		}
 		else if (encodeAudio)
@@ -188,11 +194,17 @@ int main(int argc, char** argv)
 
 				if (aleft == 0)
 				{
+					unsigned pre = ats;
 					n = fread(&ats, 1, 4, pcmfp);
 					if (n < 4)
 					{
 						encodeAudio = false;
 						break;
+					}
+
+					if (ats <= pre)
+					{
+						printf("audio back ts, pre=%u, now=%u\n", pre, ats);
 					}
 
 					aleft = AUDIO_FRAME_SIZE;
@@ -217,9 +229,14 @@ int main(int argc, char** argv)
 			}
 			pkts.clear();
 
-			if (aleft < AUDIO_FRAME_SIZE)
+			if (aleft > 0 && aleft <= AUDIO_FRAME_SIZE)
 			{
+				int64_t pre = apts;
 				apts = ats * 1000 + 1.0 * 1000 * (AUDIO_FRAME_SIZE - aleft) / AUDIO_CHANNELS / 2 / AUDIO_SAMPLE_RATE;
+				if (apts <= pre)
+				{
+					//printf("audio back ts, pre=%lld, now=%lld\n", pre, apts);
+				}
 			}
 		}
 	}

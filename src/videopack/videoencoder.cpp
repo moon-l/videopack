@@ -19,7 +19,7 @@ VideoEncoder::~VideoEncoder()
 
 int VideoEncoder::initH264(int width, int height, int fps, int bitRate)
 {
-	AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+	const AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_H264);
 	if (!codec)
 	{
 		return -1;
